@@ -1,0 +1,174 @@
+/* ================================================================
+   ALL KEYFRAMES — Zero-Day Cartographer
+   ================================================================ */
+
+/* ── CURSOR & TEXT ───────────────────────────────────────────── */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+@keyframes glitch-1 {
+  0%, 100% { clip-path: inset(0 0 95% 0); transform: translate(-2px, 0); }
+  20%       { clip-path: inset(30% 0 50% 0); transform: translate(2px, 0); }
+  40%       { clip-path: inset(70% 0 10% 0); transform: translate(-1px, 0); }
+  60%       { clip-path: inset(10% 0 80% 0); transform: translate(1px, 0); }
+  80%       { clip-path: inset(50% 0 30% 0); transform: translate(-2px, 0); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { clip-path: inset(80% 0 0 0); transform: translate(2px, 0); color: var(--cyan); }
+  33%       { clip-path: inset(10% 0 60% 0); transform: translate(-2px, 0); color: var(--red); }
+  66%       { clip-path: inset(40% 0 20% 0); transform: translate(1px, 0); color: var(--yellow); }
+}
+
+/* ── NODE PULSES ─────────────────────────────────────────────── */
+@keyframes pulse-critical {
+  0%, 100% { 
+    box-shadow: var(--shadow-md), 0 0 0 0 var(--sev-critical-glow);
+    border-color: var(--sev-critical);
+  }
+  50% { 
+    box-shadow: var(--shadow-md), 0 0 20px 8px var(--sev-critical-glow);
+    border-color: var(--red);
+  }
+}
+
+@keyframes pulse-high {
+  0%, 100% { box-shadow: var(--shadow-md), 0 0 0 0 var(--sev-high-glow); }
+  50%       { box-shadow: var(--shadow-md), 0 0 14px 5px var(--sev-high-glow); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.7; }
+}
+
+/* ── UI ENTRANCE ANIMATIONS ─────────────────────────────────── */
+@keyframes slam-in-right {
+  0%   { transform: translateX(110%); }
+  70%  { transform: translateX(-8px); }
+  85%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes slam-in-up {
+  0%   { transform: translateY(110%); }
+  70%  { transform: translateY(-6px); }
+  85%  { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes fade-stamp {
+  0%   { opacity: 0; transform: scale(1.4) rotate(-3deg); }
+  40%  { opacity: 1; transform: scale(0.95) rotate(-1deg); }
+  70%  { transform: scale(1.02) rotate(-1.5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-2deg); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes stagger-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── BACKGROUND FX ───────────────────────────────────────────── */
+@keyframes scanline-move {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  animation-name: ticker-scroll;
+  animation-duration: var(--ticker-duration, 24s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.ticker-track.is-paused {
+  animation-play-state: paused;
+}
+
+/* ── NUMBER & PROGRESS ───────────────────────────────────────── */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+  to   { width: var(--target-width, 100%); }
+}
+
+/* ── AGENT ACTIVITY ──────────────────────────────────────────── */
+@keyframes agent-thinking {
+  0%, 100% { border-color: var(--green); }
+  33%       { border-color: var(--cyan); }
+  66%       { border-color: var(--yellow); }
+}
+
+@keyframes loading-bar {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes flicker {
+  0%, 92%, 100% { opacity: 1; }
+  93%           { opacity: 0.6; }
+  94%           { opacity: 1; }
+  96%           { opacity: 0.8; }
+  98%           { opacity: 1; }
+}
+
+/* ── LEGACY FALLBACK ANIMATIONS ─────────────────────────────── */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes flicker {
+  0%, 95%, 100% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 0.7;
+  }
+  97% {
+    opacity: 1;
+  }
+  98% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes loading-bar {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}

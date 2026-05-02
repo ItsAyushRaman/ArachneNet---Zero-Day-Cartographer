@@ -1,0 +1,94 @@
+/* ================================================================
+   GLOBAL STYLES
+   Zero-Day Cartographer v3 — Alive Edition
+   ================================================================ */
+
+/* Import all style modules */
+@import url('./tokens.css');
+@import url('./reset.css');
+@import url('./animations.css');
+@import url('./typography.css');
+@import url('./brutalism.css');
+
+/* ── SCROLLBAR STYLING ──────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-dim);
+  border: 2px solid var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border);
+}
+
+/* ── ROOT STYLES ──────────────────────────────────────────────– */
+html {
+  background: var(--bg-base);
+  color: var(--text-1);
+  font-family: var(--f-mono);
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-1);
+  transition: background 60ms ease, color 60ms ease;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── SELECTION STYLING ──────────────────────────────────────– */
+::selection {
+  background: var(--yellow);
+  color: var(--text-inv);
+}
+
+::-moz-selection {
+  background: var(--yellow);
+  color: var(--text-inv);
+}
+
+/* ── FOCUS STATES ──────────────────────────────────────────– */
+:focus-visible {
+  outline: 2px dashed var(--cyan);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px dashed var(--cyan);
+  outline-offset: 2px;
+}
+
+/* ── UTILITY CLASSES ────────────────────────────────────────– */
+.hidden {
+  display: none;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

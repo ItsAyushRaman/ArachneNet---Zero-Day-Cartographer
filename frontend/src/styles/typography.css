@@ -1,0 +1,118 @@
+/* ================================================================
+   TYPOGRAPHY SYSTEM
+   ================================================================ */
+
+/* ── FONT SCALES ─────────────────────────────────────────────– */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+}
+
+h1 {
+  font-family: var(--f-display);
+  font-size: 2rem;
+  letter-spacing: 0.2em;
+}
+
+h2 {
+  font-family: var(--f-headline);
+  font-size: 1.4rem;
+  letter-spacing: 0.06em;
+}
+
+h3 {
+  font-family: var(--f-headline);
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+}
+
+h4 {
+  font-family: var(--f-mono);
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+}
+
+p {
+  font-family: var(--f-mono);
+  font-size: 0.76rem;
+  line-height: 1.75;
+  color: var(--text-2);
+}
+
+small {
+  font-family: var(--f-data);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+}
+
+code, pre {
+  font-family: var(--f-data);
+  font-size: 0.72rem;
+}
+
+code {
+  background: var(--bg-overlay);
+  padding: 2px 6px;
+  border-radius: 0;
+  color: var(--cyan);
+}
+
+pre {
+  background: var(--bg-code);
+  padding: 12px;
+  border: 2px solid var(--border-dim);
+  overflow-x: auto;
+  line-height: 1.6;
+  color: var(--green);
+}
+
+/* ── BLOCKQUOTES ─────────────────────────────────────────────– */
+blockquote {
+  border-left: 4px solid var(--yellow);
+  padding-left: 12px;
+  margin-left: 0;
+  font-style: italic;
+  color: var(--text-2);
+}
+
+/* ── LINKS ──────────────────────────────────────────────────– */
+a {
+  color: var(--cyan);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--ease-snap);
+}
+
+a:hover {
+  border-bottom-color: var(--cyan);
+}
+
+a:active {
+  color: var(--magenta);
+}
+
+/* ── LISTS ──────────────────────────────────────────────────– */
+ul, ol {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+li {
+  margin-bottom: 0.5em;
+  font-family: var(--f-mono);
+  font-size: 0.76rem;
+}
+
+dt {
+  font-family: var(--f-data);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 0.75em;
+}
+
+dd {
+  margin-left: 1.5em;
+  margin-bottom: 0.5em;
+}

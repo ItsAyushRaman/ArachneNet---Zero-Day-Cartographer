@@ -1,0 +1,142 @@
+.code-output {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  padding: 0.75rem 1rem;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  color: var(--accent-cyan);
+}
+
+.tab.active {
+  color: var(--accent-cyan);
+  border-bottom-color: var(--accent-cyan);
+}
+
+.tab-content {
+  margin: 1rem 0;
+}
+
+.code-section {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+}
+
+.code-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.copy-btn {
+  padding: 0.35rem 0.75rem;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--accent-green);
+  border-radius: 2px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background-color: var(--accent-green);
+  color: var(--bg);
+}
+
+.copy-btn.copied {
+  color: var(--accent-green);
+}
+
+.code-block {
+  margin: 0 !important;
+  border-radius: 0 0 4px 4px;
+  border: 1px solid var(--border) !important;
+  border-top: none !important;
+  background-color: var(--bg) !important;
+  padding: 1rem !important;
+  font-size: 0.8rem !important;
+  line-height: 1.5 !important;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Scrollbar in code block */
+.code-block::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.code-block::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+.code-block::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.code-block::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-cyan);
+}
+
+.explanation {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: rgba(6, 182, 212, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.explanation-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.explanation-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+}

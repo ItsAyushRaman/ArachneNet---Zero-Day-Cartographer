@@ -1,0 +1,119 @@
+/* ================================================================
+   NEOBRUTALISM UTILITY SYSTEM
+   ================================================================ */
+
+/* ── CARDS ──────────────────────────────────────────────────– */
+.nb-card {
+  background: var(--bg-surface);
+  border: var(--border-w) solid var(--border);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius);
+}
+.nb-card-sm  { background: var(--bg-surface); border: var(--border-w) solid var(--border); box-shadow: var(--shadow-sm); border-radius: 0; }
+.nb-card-lg  { background: var(--bg-surface); border: var(--border-w) solid var(--border); box-shadow: var(--shadow-lg); border-radius: 0; }
+.nb-card-xl  { background: var(--bg-surface); border: var(--border-w) solid var(--border); box-shadow: var(--shadow-xl); border-radius: 0; }
+.nb-inset    { border: var(--border-w) solid var(--border); box-shadow: inset 2px 2px 0 rgba(0,0,0,0.4); }
+
+/* ── BUTTONS ─────────────────────────────────────────────────– */
+.nb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--bg-surface);
+  color: var(--text-1);
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: var(--border-w) solid var(--border);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: background var(--ease-snap), color var(--ease-snap),
+              transform var(--ease-snap), box-shadow var(--ease-snap);
+  user-select: none;
+  white-space: nowrap;
+  border-radius: 0;
+  text-decoration: none;
+}
+.nb-btn:hover:not(:disabled) {
+  background: var(--yellow);
+  color: var(--text-inv);
+}
+.nb-btn:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: var(--shadow-xs);
+}
+.nb-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.nb-btn--primary {
+  background: var(--yellow);
+  color: var(--text-inv);
+}
+.nb-btn--primary:hover:not(:disabled) {
+  background: var(--red);
+  color: #fff;
+}
+.nb-btn--danger {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--border);
+}
+.nb-btn--ghost {
+  background: transparent;
+  box-shadow: none;
+  border-color: var(--border-dim);
+}
+.nb-btn--ghost:hover:not(:disabled) {
+  background: var(--yellow);
+  color: var(--text-inv);
+  border-color: var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── DIVIDERS ─────────────────────────────────────────────────– */
+.nb-divider      { border: none; border-top: var(--border-w) solid var(--border); margin: 0; }
+.nb-divider-dim  { border: none; border-top: 1px solid var(--border-dim); margin: 0; }
+
+/* ── DATA LABELS ─────────────────────────────────────────────– */
+.data-label {
+  font-family: var(--f-data);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-3);
+}
+.data-value {
+  font-family: var(--f-data);
+  font-size: 0.75rem;
+  color: var(--text-1);
+}
+.data-accent {
+  font-family: var(--f-data);
+  font-size: 0.75rem;
+  color: var(--cyan);
+}
+.data-warn {
+  font-family: var(--f-data);
+  font-size: 0.75rem;
+  color: var(--amber);
+}
+
+/* ── TERMINAL LINES ───────────────────────────────────────────– */
+.term { font-family: var(--f-data); font-size: 0.72rem; }
+.term--green { color: var(--green); }
+.term--cyan  { color: var(--cyan); }
+.term--red   { color: var(--red); }
+.term--dim   { color: var(--text-3); }
+.term::before { content: '› '; opacity: 0.6; }
+
+/* ── SEVERITY CLASSES ─────────────────────────────────────────– */
+.sev-critical { color: var(--sev-critical); }
+.sev-high     { color: var(--sev-high); }
+.sev-medium   { color: var(--sev-medium); }
+.sev-low      { color: var(--sev-low); }

@@ -1,0 +1,84 @@
+.app {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg);
+  color: var(--text-primary);
+}
+
+.main-container {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 56px;
+}
+
+.graph-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: var(--bg);
+}
+
+.loading,
+.error,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.loading p,
+.error p,
+.empty p {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+.empty p.subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+}
+
+.error {
+  color: var(--accent-red);
+}
+
+.error button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  background-color: var(--accent-red);
+  color: white;
+  border: 1px solid var(--accent-red);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.error button:hover {
+  background-color: transparent;
+  box-shadow: 0 0 12px rgba(255, 59, 59, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .graph-container {
+    flex: 1;
+  }
+}

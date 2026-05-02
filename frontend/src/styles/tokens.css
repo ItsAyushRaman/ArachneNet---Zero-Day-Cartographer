@@ -1,0 +1,178 @@
+/* ============================================================
+   DESIGN TOKENS — Zero-Day Cartographer
+   NeoBrutalism × Techy · Dark + Light
+   ============================================================ */
+
+:root,
+:root[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-base:     #080808;
+  --bg-surface:  #101010;
+  --bg-elevated: #181818;
+  --bg-overlay:  #222222;
+  --bg-code:     #050505;
+
+  /* NeoBrutalism — WHITE borders/shadows in dark */
+  --border-col:  #ffffff;
+  --border-dim:  #333333;
+  --border-w:    2px;
+  --sh-xs:       2px 2px 0 #ffffff;
+  --sh-sm:       3px 3px 0 #ffffff;
+  --sh-md:       4px 4px 0 #ffffff;
+  --sh-lg:       6px 6px 0 #ffffff;
+  --sh-xl:       8px 8px 0 #ffffff;
+
+  /* Accents */
+  --yellow:   #FFE500;
+  --red:      #FF1A1A;
+  --cyan:     #00F0FF;
+  --green:    #00FF41;
+  --orange:   #FF6B00;
+  --magenta:  #FF00CC;
+  --amber:    #FFB800;
+
+  /* Severity */
+  --sev-critical:      #FF1A1A;
+  --sev-critical-glow: rgba(255,26,26,0.6);
+  --sev-high:          #FFE500;
+  --sev-high-glow:     rgba(255,229,0,0.5);
+  --sev-medium:        #FF6B00;
+  --sev-medium-glow:   rgba(255,107,0,0.4);
+  --sev-low:           #00FF41;
+  --sev-low-glow:      rgba(0,255,65,0.3);
+
+  /* Text */
+  --t1: #F0F0F0;
+  --t2: #AAAAAA;
+  --t3: #555555;
+  --t-inv: #080808;
+
+  /* Graph */
+  --graph-bg:   #080808;
+  --graph-link: #2a2a2a;
+  --graph-grid: rgba(255,255,255,0.03);
+
+  /* Misc */
+  --scanline-op: 0.04;
+  --radius: 0px;
+
+  /* Fonts */
+  --f-display: 'Orbitron', monospace;
+  --f-mono:    'Space Mono', monospace;
+  --f-data:    'Fragment Mono', monospace;
+
+  /* Timing */
+  --ease-snap: 60ms ease;
+  --ease-fast: 120ms ease;
+  --ease-med:  250ms ease;
+  --ease-slow: 400ms ease;
+
+  /* Z-index */
+  --z-graph:   1;
+  --z-overlay: 10;
+  --z-panel:   50;
+  --z-header:  100;
+  --z-tooltip: 200;
+
+  /* Legacy aliases kept for older component surfaces */
+  --border: var(--border-col);
+  --border-color: var(--border-col);
+  --shadow-xs: var(--sh-xs);
+  --shadow-sm: var(--sh-sm);
+  --shadow-md: var(--sh-md);
+  --shadow-lg: var(--sh-lg);
+  --shadow-xl: var(--sh-xl);
+  --shadow-hard: var(--sh-xl);
+  --text-1: var(--t1);
+  --text-2: var(--t2);
+  --text-3: var(--t3);
+  --text-inv: var(--t-inv);
+  --text-primary: var(--t1);
+  --text-secondary: var(--t2);
+  --text-muted: var(--t3);
+  --text-inverse: var(--t-inv);
+  --accent-red: var(--red);
+  --accent-green: var(--green);
+  --accent-cyan: var(--cyan);
+  --accent-yellow: var(--yellow);
+  --accent-orange: var(--orange);
+  --font-display: var(--f-display);
+  --font-mono: var(--f-mono);
+  --font-data: var(--f-data);
+  --severity-critical: var(--sev-critical);
+  --severity-high: var(--sev-high);
+  --severity-medium: var(--sev-medium);
+  --severity-low: var(--sev-low);
+}
+
+:root[data-theme="light"] {
+  --bg-base:     #F2F0E8;
+  --bg-surface:  #FAFAF5;
+  --bg-elevated: #EEECEA;
+  --bg-overlay:  #E2E0D8;
+  --bg-code:     #F8F6EE;
+
+  --border-col:  #0A0A0A;
+  --border-dim:  #BBBBBB;
+  --sh-xs:       2px 2px 0 #0A0A0A;
+  --sh-sm:       3px 3px 0 #0A0A0A;
+  --sh-md:       4px 4px 0 #0A0A0A;
+  --sh-lg:       6px 6px 0 #0A0A0A;
+  --sh-xl:       8px 8px 0 #0A0A0A;
+
+  --yellow:  #C8B400;
+  --red:     #CC0000;
+  --cyan:    #0066BB;
+  --green:   #006620;
+  --orange:  #BB4400;
+  --amber:   #996600;
+
+  --sev-critical:      #CC0000;
+  --sev-critical-glow: rgba(204,0,0,0.25);
+  --sev-high:          #C8B400;
+  --sev-high-glow:     rgba(200,180,0,0.25);
+  --sev-medium:        #BB4400;
+  --sev-medium-glow:   rgba(187,68,0,0.2);
+  --sev-low:           #006620;
+  --sev-low-glow:      rgba(0,102,32,0.2);
+
+  --t1: #0A0A0A;
+  --t2: #444444;
+  --t3: #888888;
+  --t-inv: #FAFAF5;
+
+  --graph-bg:   #EEECEA;
+  --graph-link: #CCCCCC;
+  --graph-grid: rgba(0,0,0,0.04);
+  --scanline-op: 0.015;
+
+  /* Legacy aliases kept for older component surfaces */
+  --border: var(--border-col);
+  --border-color: var(--border-col);
+  --shadow-xs: var(--sh-xs);
+  --shadow-sm: var(--sh-sm);
+  --shadow-md: var(--sh-md);
+  --shadow-lg: var(--sh-lg);
+  --shadow-xl: var(--sh-xl);
+  --shadow-hard: var(--sh-xl);
+  --text-1: var(--t1);
+  --text-2: var(--t2);
+  --text-3: var(--t3);
+  --text-inv: var(--t-inv);
+  --text-primary: var(--t1);
+  --text-secondary: var(--t2);
+  --text-muted: var(--t3);
+  --text-inverse: var(--t-inv);
+  --accent-red: var(--red);
+  --accent-green: var(--green);
+  --accent-cyan: var(--cyan);
+  --accent-yellow: var(--yellow);
+  --accent-orange: var(--orange);
+  --font-display: var(--f-display);
+  --font-mono: var(--f-mono);
+  --font-data: var(--f-data);
+  --severity-critical: var(--sev-critical);
+  --severity-high: var(--sev-high);
+  --severity-medium: var(--sev-medium);
+  --severity-low: var(--sev-low);
+}

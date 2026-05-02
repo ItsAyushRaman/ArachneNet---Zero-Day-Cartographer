@@ -1,0 +1,94 @@
+/* Utility classes for the NeoBrutalist system */
+
+.nb-card {
+  background: var(--bg-surface);
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow-hard);
+}
+
+.nb-card-sm {
+  background: var(--bg-surface);
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.nb-inset {
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+.nb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow-hard);
+  cursor: pointer;
+  transition: all var(--transition-snap);
+  user-select: none;
+}
+
+.nb-btn:hover {
+  background: var(--accent-yellow);
+  color: var(--text-inverse);
+}
+
+.nb-btn:active {
+  transform: translateX(2px) translateY(2px);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.nb-btn--danger {
+  background: var(--accent-red);
+  color: #ffffff;
+  border-color: var(--border-color);
+}
+
+.nb-btn--danger:hover {
+  background: var(--accent-yellow);
+  color: var(--text-inverse);
+}
+
+.nb-btn--primary {
+  background: var(--accent-yellow);
+  color: var(--text-inverse);
+}
+
+.nb-btn--primary:hover {
+  background: var(--accent-red);
+  color: #ffffff;
+}
+
+.nb-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.data-label {
+  font-family: var(--font-data);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+.data-value {
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  color: var(--text-primary);
+}
+
+.terminal-line::before {
+  content: '> ';
+  color: var(--accent-green);
+  font-family: var(--font-data);
+}
