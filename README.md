@@ -172,7 +172,7 @@ INFO:     Application startup complete.
 ### Terminal 3: Start Frontend
 
 ```bash
-cd d:\College Projects\H4G\zero-day-cartographer\frontend
+cd path
 npm run dev
 ```
 
