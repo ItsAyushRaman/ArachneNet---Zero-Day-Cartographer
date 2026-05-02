@@ -1,0 +1,30 @@
+services:
+  localai:
+    image: ghcr.io/go-skynet/localai/localai:latest
+    container_name: zdc-localai
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models:/models
+    command: ["--models-dir", "/models"]
+    restart: unless-stopped
+
+  backend:
+    build: .
+    container_name: zdc-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - LLM_PROVIDER=localai
+      - LLM_BASE_URL=http://localai:8080
+      - LLM_MODEL=qwen-7b-chat-q4
+      - SCRAPE_INTERVAL_HOURS=1
+      - INITIAL_SCRAPE_ON_STARTUP=true
+      - ALLOW_MOCK_FALLBACK=true
+      - USE_MOCK_DATA=false
+      - DB_PATH=/app/backend/db/threats.db
+    depends_on:
+      - localai
+    volumes:
+      - .:/app
+    restart: unless-stopped

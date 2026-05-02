@@ -3,7 +3,7 @@ import { SEVERITIES, getSeverityHex } from '../../utils/severity.js'
 import { formatISO } from '../../utils/formatters.js'
 import useCountUp from '../../hooks/useCountUp.js'
 
-export default function StatusBar({ threats = [], sourcesCount = 4, lastUpdated, onRefresh, refreshing }) {
+export default function StatusBar({ threats = [], sourcesCount = 4, lastUpdated, connected = false, onRefresh, refreshing }) {
   const totalCount = useCountUp(threats.length)
   const counts = Object.fromEntries(
     SEVERITIES.map(s => [s, threats.filter(t => t.severity === s).length])
@@ -39,6 +39,9 @@ export default function StatusBar({ threats = [], sourcesCount = 4, lastUpdated,
 
       {/* RIGHT */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ color: connected ? 'var(--green)' : 'var(--orange)' }}>
+          {connected ? 'LIVE' : 'POLLING'}
+        </span>
         <span style={{ color: 'var(--t3)' }}>
           LAST: {lastUpdated ? formatISO(lastUpdated.toISOString()) : 'PENDING'}
         </span>

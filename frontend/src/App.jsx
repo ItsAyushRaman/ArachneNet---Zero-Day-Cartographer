@@ -5,10 +5,12 @@ import ThreatPanel from './components/panel/ThreatPanel.jsx'
 import { ErrorBox } from './components/ui/index.js'
 import useThreats from './hooks/useThreats.js'
 import useGenerate from './hooks/useGenerate.js'
+import useStatus from './hooks/useStatus.js'
 import { refreshThreats } from './utils/api.js'
 
 export default function App() {
-  const { threats, loading, error: threatsError, refetch, lastUpdated } = useThreats()
+  const { threats, loading, error: threatsError, refetch, lastUpdated, connected } = useThreats()
+  const { sourcesCount } = useStatus()
   const { result, generating, error: genError, generate, reset } = useGenerate()
   const [selectedThreat, setSelectedThreat] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
@@ -43,8 +45,9 @@ export default function App() {
       threats={threats}
       statusProps={{
         threats,
-        sourcesCount: 4,
+        sourcesCount: sourcesCount || 0,
         lastUpdated,
+        connected,
         onRefresh: handleRefresh,
         refreshing,
       }}

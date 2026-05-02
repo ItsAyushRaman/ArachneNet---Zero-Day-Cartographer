@@ -1,9 +1,12 @@
+import asyncio
+import re
+from datetime import datetime
+
 import feedparser
 import httpx
 from bs4 import BeautifulSoup
-from datetime import datetime
-import asyncio
-import re
+
+from config import MAX_ARTICLES_PER_SOURCE
 
 async def scrape_all_sources(sources: list) -> list:
     """
@@ -33,15 +36,21 @@ async def scrape_single_source(source: dict) -> list:
     try:
         source_name = source.get("name", "Unknown")
         source_url = source.get("url", "")
-        
-        # Fetch the feed
-        feed = feedparser.parse(source_url)
+
+        # Fetch feed content asynchronously, then parse locally.
+        async with httpx.AsyncClient(timeout=20.0, follow_redirects=True, headers={
+            "User-Agent": "Zero-Day Cartographer/1.0"
+        }) as client:
+            response = await client.get(source_url)
+            response.raise_for_status()
+
+        feed = feedparser.parse(response.text)
         
         if feed.bozo:
             print(f"[SCRAPER WARNING] Feed parsing warning for {source_name}: {feed.bozo_exception}")
         
         articles = []
-        for entry in feed.entries[:10]:  # Limit to 10 latest entries per source
+        for entry in feed.entries[:MAX_ARTICLES_PER_SOURCE]:
             title = entry.get("title", "No Title")
             link = entry.get("link", source_url)
             
@@ -65,7 +74,8 @@ async def scrape_single_source(source: dict) -> list:
                 "title": title,
                 "text": clean_text,
                 "pub_date": pub_date,
-                "link": link
+                "link": link,
+                "summary": clean_text,
             })
         
         return articles

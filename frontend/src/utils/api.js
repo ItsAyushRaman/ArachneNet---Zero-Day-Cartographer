@@ -1,8 +1,22 @@
 import axios from 'axios'
 
+const DEFAULT_BACKEND_URL = 'http://localhost:8000'
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || DEFAULT_BACKEND_URL
+
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: BACKEND_URL,
 })
+
+export const getBackendUrl = () => BACKEND_URL
+
+export const getWebSocketUrl = (path = '/ws/live') => {
+  const url = new URL(BACKEND_URL)
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+  url.pathname = path
+  url.search = ''
+  url.hash = ''
+  return url.toString()
+}
 
 export const fetchThreats = async () => {
   const { data } = await api.get('/api/threats')

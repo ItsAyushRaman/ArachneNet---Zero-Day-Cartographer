@@ -1,8 +1,16 @@
 # Zero-Day Cartographer — Quick Start Guide
 
-Get the threat intelligence dashboard running in 5 minutes.
+Get the dashboard running with live RSS data and a local LLM.
 
-## Step 1: Install Dependencies
+## 1. Read the setup guide
+
+Follow the full backend guide first:
+
+- [backend/SETUP.md](backend/SETUP.md)
+
+That guide covers LocalAI, model selection, environment variables, the database, and realtime updates.
+
+## 2. Install dependencies
 
 ### Backend
 ```bash
@@ -16,171 +24,70 @@ cd frontend
 npm install
 ```
 
-## Step 2: Configure API Key
+## 3. Configure environment
 
-Edit the `.env` file in the root directory:
-```env
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
+Copy the backend example env file:
+
+```bash
+copy backend\.env.example backend\.env
 ```
 
-Get your API key from [Anthropic Console](https://console.anthropic.com)
+Set these values in `backend/.env`:
 
-## Step 3: Start Backend
+```env
+LLM_PROVIDER=localai
+LLM_BASE_URL=http://localhost:8080
+LLM_MODEL=qwen-7b-chat-q4
+```
 
-In a terminal, from the project root:
+## 4. Start LocalAI
+
+Place a GGUF model in `backend/models/`, then run:
+
+```bash
+docker run --rm -p 8080:8080 -v %cd%/backend/models:/models ghcr.io/go-skynet/localai/localai:latest --models-dir /models
+```
+
+## 5. Start backend
+
 ```bash
 cd backend
 python -m uvicorn main:app --reload --port 8000
 ```
 
-You should see:
-```
-INFO:     Uvicorn running on http://127.0.0.1:8000
-INFO:     Application startup complete
-```
+## 6. Start frontend
 
-✅ Backend is ready at `http://localhost:8000`
-
-## Step 4: Start Frontend
-
-In a new terminal, from the project root:
 ```bash
 cd frontend
 npm run dev
 ```
 
-You should see:
-```
-  VITE v5.1.0  ready in XXX ms
+## 7. Open the dashboard
 
-  ➜  Local:   http://localhost:5173/
-  ➜  press h to show help
-```
+Visit `http://localhost:5173`.
 
-✅ Frontend is ready at `http://localhost:5173`
+## 8. Verify realtime data
 
-## Step 5: Open the Dashboard
-
-Visit `http://localhost:5173` in your browser.
-
-### First Run
-- The graph will be empty initially (waiting for threats)
-- Click **REFRESH** button in the bottom-right
-- Wait 5-10 seconds for threats to populate from RSS feeds
-- You'll see colored nodes appear on the 3D graph
-
-### Interact with Threats
-1. **Click a node** → Side panel opens with threat details
-2. Click **GENERATE PATCH** → Creates Next.js middleware + firewall rules
-3. **Copy** the generated code with one click
-4. Check **Status Bar** (bottom) for live threat count
-
-## Testing Endpoints with curl
-
-Verify the backend is working:
+Run these checks:
 
 ```bash
-# Check status
-curl http://localhost:8000/api/status
-
-# List threats
-curl http://localhost:8000/api/threats
-
-# Health check
 curl http://localhost:8000/health
-
-# Trigger refresh (create new threats)
+curl http://localhost:8000/api/status
+curl http://localhost:8000/api/threats
 curl -X POST http://localhost:8000/api/refresh
 ```
 
-## Troubleshooting
+## 9. What you should see
 
-### Backend won't start
-- Ensure Python 3.11+ is installed: `python --version`
-- Missing dependencies? Run: `pip install -r requirements.txt`
-- Port 8000 in use? Change with: `--port 8001`
+- The graph loads with threat nodes from live feeds or bootstrap data.
+- Clicking a node opens the threat detail panel.
+- Generating a patch returns Next.js middleware and a firewall regex.
+- Realtime websocket updates are available at `ws://localhost:8000/ws/live`.
 
-### Frontend won't start
-- Ensure Node 18+ is installed: `node --version`
-- Missing modules? Run: `npm install`
-- Port 5173 in use? Vite will auto-pick next available
+## 10. Troubleshooting
 
-### No threats showing
-- Check `.env` has valid `ANTHROPIC_API_KEY`
-- Click REFRESH and wait 10 seconds
-- Check terminal logs for errors
-- Verify backend is running: `curl http://localhost:8000/health`
+- If no threats appear, confirm RSS access and check backend logs.
+- If patch generation is slow, lower the model size or use a quantized GGUF.
+- If LocalAI is unavailable, the backend falls back to deterministic templates so the UI still works.
 
-### API calls failing
-- Ensure backend is running on port 8000
-- Check CORS: backend has `http://localhost:5173` whitelisted
-- Check browser console for error messages
-
-## Next Steps
-
-### Customize Threat Sources
-Edit `backend/config.py` to add/remove RSS feeds:
-```python
-THREAT_SOURCES = [
-    {
-        "name": "Your Feed",
-        "url": "https://example.com/feed.xml",
-        "type": "rss"
-    },
-    # ... more feeds
-]
-```
-
-### Adjust Scrape Frequency
-In `backend/config.py`:
-```python
-SCRAPE_INTERVAL_HOURS = 6  # Change to desired interval
-```
-
-### Customize Colors & Fonts
-Edit `frontend/src/styles/global.css`:
-```css
-:root {
-  --accent-red: #ff3b3b;    /* Change severity colors */
-  --accent-cyan: #06b6d4;
-  /* ... */
-}
-```
-
-## Architecture Overview
-
-```
-┌─────────────────────────────────────────┐
-│   React + Three.js (http://5173)        │
-│   → Interactive 3D threat graph         │
-└────────────────┬────────────────────────┘
-                 │ HTTP REST API
-┌────────────────▼────────────────────────┐
-│   FastAPI Backend (http://8000)         │
-│   → Threat extraction & code generation │
-└────────────────┬────────────────────────┘
-                 │
-        ┌────────┴────────┐
-        │                 │
-    ┌───▼──┐      ┌──────▼────┐
-    │ RSS  │      │  Anthropic │
-    │Feeds │      │   Claude   │
-    └──────┘      └────────────┘
-        │                 │
-        └────────┬────────┘
-                 │
-            ┌────▼────┐
-            │ SQLite  │
-            │   DB    │
-            └─────────┘
-```
-
-## Support
-
-For detailed documentation, see [README.md](./README.md)
-
-For API reference, run backend and visit: `http://localhost:8000/docs`
-
----
-
-**Ready?** Start with Step 1 above! 🚀
+For deeper details, return to [backend/SETUP.md](backend/SETUP.md).

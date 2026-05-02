@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { fetchStatus } from '../utils/api.js';
 
 const useStatus = () => {
   const [status, setStatus] = useState({
@@ -11,14 +11,14 @@ const useStatus = () => {
   });
 
   useEffect(() => {
-    const fetchStatus = async () => {
+    const loadStatus = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/status');
+        const data = await fetchStatus();
         setStatus(prev => ({
           ...prev,
-          threatCount: response.data.threat_count || 0,
-          sourcesCount: response.data.sources_count || 0,
-          lastUpdated: response.data.last_updated,
+          threatCount: data?.threat_count || 0,
+          sourcesCount: data?.sources_count || 0,
+          lastUpdated: data?.last_updated,
           loading: false,
           error: null
         }));
@@ -32,8 +32,8 @@ const useStatus = () => {
       }
     };
 
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 30000); // Poll every 30s
+    loadStatus();
+    const interval = setInterval(loadStatus, 30000); // Poll every 30s
     return () => clearInterval(interval);
   }, []);
 

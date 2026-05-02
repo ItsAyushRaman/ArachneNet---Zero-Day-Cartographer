@@ -1,20 +1,32 @@
 import asyncio
-from fastapi import FastAPI, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
+
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from db.database import (
-    init_db, get_all_threats, get_threat_by_id, 
-    insert_threat, get_threat_count, get_last_updated
+    bulk_upsert_threats,
+    get_all_threats,
+    get_last_updated,
+    get_threat_by_id,
+    get_threat_count,
+    init_db,
+    insert_threat,
 )
 from models.threat import ThreatNode, GenerateRequest, GenerateResponse, StatusResponse
-from config import THREAT_SOURCES, SCRAPE_INTERVAL_HOURS, TEST_MODE
+from config import (
+    ALLOW_MOCK_FALLBACK,
+    INITIAL_SCRAPE_ON_STARTUP,
+    SCRAPE_INTERVAL_HOURS,
+    THREAT_SOURCES,
+    USE_MOCK_DATA,
+)
 from scraper.feeds import scrape_all_sources
 from agents.researcher import run_researcher_agent
 from agents.engineer import run_engineer_agent
 from test_data import get_mock_threats
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,7 +38,7 @@ app = FastAPI(title="Zero-Day Cartographer", version="0.1.0")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,6 +47,49 @@ app.add_middleware(
 # Global state
 scheduler = None
 last_scrape_time = None
+scrape_lock = asyncio.Lock()
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.connections: set[WebSocket] = set()
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.connections.add(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.connections.discard(websocket)
+
+    async def broadcast(self, message: dict):
+        if not self.connections:
+            return
+        dead = []
+        for websocket in self.connections:
+            try:
+                await websocket.send_json(message)
+            except Exception:
+                dead.append(websocket)
+        for websocket in dead:
+            self.disconnect(websocket)
+
+
+realtime_manager = ConnectionManager()
+
+
+async def publish_status(event_type: str, payload: dict | None = None):
+    status = {
+        "type": event_type,
+        "timestamp": datetime.utcnow().isoformat(),
+        "payload": payload or {},
+        "status": {
+            "threat_count": get_threat_count(),
+            "last_updated": get_last_updated(),
+            "sources_count": len(THREAT_SOURCES),
+        },
+    }
+    await realtime_manager.broadcast(status)
+
 
 async def run_scrape_pipeline():
     """
@@ -43,30 +98,45 @@ async def run_scrape_pipeline():
     """
     global last_scrape_time
     
-    try:
-        logger.info("Starting threat scrape pipeline...")
-        
-        # Step 1: Scrape all sources
-        raw_articles = await scrape_all_sources(THREAT_SOURCES)
-        logger.info(f"Scraped {len(raw_articles)} articles from threat sources")
-        
-        if not raw_articles:
-            logger.warning("No articles scraped")
-            return
-        
-        # Step 2: Run researcher agent
-        threats = await run_researcher_agent(raw_articles)
-        logger.info(f"Researcher agent identified {len(threats)} threats")
-        
-        # Step 3: Insert threats into database
-        for threat in threats:
-            insert_threat(threat)
-        
-        last_scrape_time = datetime.utcnow().isoformat()
-        logger.info(f"Pipeline complete. {len(threats)} new threats indexed.")
-    
-    except Exception as e:
-        logger.error(f"Pipeline error: {str(e)}")
+    async with scrape_lock:
+        try:
+            logger.info("Starting threat scrape pipeline...")
+
+            # Step 1: Scrape all sources
+            raw_articles = await scrape_all_sources(THREAT_SOURCES)
+            logger.info(f"Scraped {len(raw_articles)} articles from threat sources")
+
+            if not raw_articles:
+                logger.warning("No articles scraped")
+                if USE_MOCK_DATA or ALLOW_MOCK_FALLBACK:
+                    mock_threats = get_mock_threats()
+                    bulk_upsert_threats(mock_threats)
+                    await publish_status("threats_bootstrapped", {"new_count": len(mock_threats)})
+                    return mock_threats
+                return []
+
+            # Step 2: Run researcher agent
+            threats = await run_researcher_agent(raw_articles)
+            logger.info(f"Researcher agent identified {len(threats)} threats")
+
+            # Step 3: Insert threats into database
+            if threats:
+                bulk_upsert_threats(threats)
+            elif USE_MOCK_DATA or ALLOW_MOCK_FALLBACK:
+                mock_threats = get_mock_threats()
+                bulk_upsert_threats(mock_threats)
+                threats = mock_threats
+
+            if threats:
+                await publish_status("threats_updated", {"new_count": len(threats)})
+
+            last_scrape_time = datetime.utcnow().isoformat()
+            logger.info(f"Pipeline complete. {len(threats)} new threats indexed.")
+            return threats
+
+        except Exception as e:
+            logger.error(f"Pipeline error: {str(e)}")
+            return []
 
 @app.on_event("startup")
 async def startup_event():
@@ -74,43 +144,35 @@ async def startup_event():
     global scheduler
     
     logger.info("Starting Zero-Day Cartographer...")
-    if TEST_MODE:
-        logger.info("⚠️  TEST MODE ENABLED - Using mock threat data")
+    if USE_MOCK_DATA:
+        logger.info("⚠️  USE_MOCK_DATA enabled - using deterministic mock threat data")
     
     # Initialize database
     init_db()
     logger.info("Database initialized")
     
-    # Load mock threats in TEST_MODE
-    if TEST_MODE:
+    # Seed baseline data so the UI is never empty.
+    if USE_MOCK_DATA:
         mock_threats = get_mock_threats()
-        for threat in mock_threats:
-            insert_threat(threat)
-        logger.info(f"Loaded {len(mock_threats)} mock threats for testing")
-    
-    # Run scrape pipeline immediately (background task) - skip in test mode
-    if not TEST_MODE:
+        bulk_upsert_threats(mock_threats)
+        logger.info(f"Loaded {len(mock_threats)} mock threats for bootstrapping")
+
+    # Run scrape pipeline immediately unless explicitly disabled.
+    if INITIAL_SCRAPE_ON_STARTUP:
         asyncio.create_task(run_scrape_pipeline())
-    
-    # Set up scheduler to run every N hours (skip in test mode)
-    if not TEST_MODE:
-        scheduler = BackgroundScheduler()
-        scheduler.add_job(
-            lambda: asyncio.run(run_scrape_pipeline()),
-            'interval',
-            hours=SCRAPE_INTERVAL_HOURS
-        )
-        scheduler.start()
-        logger.info(f"Scheduler started - will scrape every {SCRAPE_INTERVAL_HOURS} hours")
-    else:
-        logger.info("Scheduler disabled in TEST MODE")
+
+    # Set up scheduler to run every N hours.
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(run_scrape_pipeline, 'interval', hours=SCRAPE_INTERVAL_HOURS)
+    scheduler.start()
+    logger.info(f"Scheduler started - will scrape every {SCRAPE_INTERVAL_HOURS} hour(s)")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Stop scheduler on app shutdown."""
     global scheduler
     if scheduler and scheduler.running:
-        scheduler.shutdown()
+        scheduler.shutdown(wait=False)
         logger.info("Scheduler stopped")
 
 # ==================== ENDPOINTS ====================
@@ -172,14 +234,13 @@ async def generate_patch(request: GenerateRequest):
         raise HTTPException(status_code=500, detail="Failed to generate patch")
 
 @app.post("/api/refresh")
-async def refresh_threats(background_tasks: BackgroundTasks):
+async def refresh_threats():
     """
     Trigger an immediate refresh of threat data.
     Researcher agent is dispatched in background.
     """
     try:
-        # Add to background tasks
-        background_tasks.add_task(run_scrape_pipeline)
+        asyncio.create_task(run_scrape_pipeline())
         
         return {
             "status": "refresh_started",
@@ -213,6 +274,32 @@ async def get_status():
 async def health_check():
     """Health check endpoint."""
     return {"status": "ok"}
+
+
+@app.websocket("/ws/live")
+async def live_updates(websocket: WebSocket):
+    """Stream threat and status updates to websocket clients."""
+    await realtime_manager.connect(websocket)
+    try:
+        await websocket.send_json({
+            "type": "connected",
+            "timestamp": datetime.utcnow().isoformat(),
+            "status": {
+                "threat_count": get_threat_count(),
+                "last_updated": get_last_updated(),
+                "sources_count": len(THREAT_SOURCES),
+            },
+            "threats": get_all_threats()[:10],
+        })
+        while True:
+            message = await websocket.receive_text()
+            if message.lower() == "ping":
+                await websocket.send_json({"type": "pong", "timestamp": datetime.utcnow().isoformat()})
+    except WebSocketDisconnect:
+        realtime_manager.disconnect(websocket)
+    except Exception as e:
+        logger.error(f"WebSocket error: {str(e)}")
+        realtime_manager.disconnect(websocket)
 
 if __name__ == "__main__":
     import uvicorn

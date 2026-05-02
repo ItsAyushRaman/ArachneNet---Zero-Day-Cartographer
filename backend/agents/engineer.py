@@ -1,8 +1,5 @@
-import json
-from anthropic import Anthropic
-from config import TEST_MODE, ANTHROPIC_API_KEY
-
-client = Anthropic(api_key=ANTHROPIC_API_KEY) if not TEST_MODE else None
+from config import ALLOW_MOCK_FALLBACK, LLM_TEMPERATURE, LLM_TIMEOUT_SECONDS, USE_MOCK_DATA
+from services.local_llm import call_local_llm_json
 
 SYSTEM_PROMPT = """You are a senior security engineer. You receive structured data about a web application 
 attack vector. You must generate TWO things:
@@ -33,9 +30,9 @@ Format:
 async def run_engineer_agent(threat: dict) -> dict:
     """
     Generate middleware and firewall rules for a specific threat.
-    In TEST_MODE, returns realistic sample code.
+    Uses the local LLM when available, with deterministic fallback templates.
     """
-    if TEST_MODE:
+    if USE_MOCK_DATA:
         return get_test_patch_for_threat(threat)
     
     try:
@@ -46,38 +43,26 @@ Affected Layer: {threat.get('affected_layer', 'Infrastructure')}
 Description: {threat.get('description', '')}
 Raw Context: {threat.get('raw_excerpt', '')}
 """
-        
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=2000,
-            system=SYSTEM_PROMPT,
-            messages=[
-                {
-                    "role": "user",
-                    "content": user_prompt
-                }
-            ]
+
+        async def fallback():
+            return get_test_patch_for_threat(threat)
+
+        result = await call_local_llm_json(
+            system_prompt=SYSTEM_PROMPT,
+            user_prompt=user_prompt,
+            fallback=fallback,
+            max_tokens=1500,
+            temperature=LLM_TEMPERATURE,
         )
-        
-        response_text = response.content[0].text
-        
-        # Parse JSON response
-        result = json.loads(response_text)
-        
+
         return {
             "middleware_code": result.get("middleware_code", "// Generation failed."),
             "firewall_regex": result.get("firewall_regex", ""),
             "explanation": result.get("explanation", "No explanation provided.")
         }
-    
-    except json.JSONDecodeError as e:
-        print(f"[ENGINEER ERROR] Failed to parse JSON response: {str(e)}")
-        return {
-            "middleware_code": "// Generation failed. Please try again.",
-            "firewall_regex": "",
-            "explanation": "LLM response could not be parsed."
-        }
     except Exception as e:
+        if ALLOW_MOCK_FALLBACK:
+            return get_test_patch_for_threat(threat)
         print(f"[ENGINEER ERROR] {str(e)}")
         return {
             "middleware_code": "// Generation failed. Please try again.",
