@@ -1,0 +1,89 @@
+import feedparser
+import httpx
+from bs4 import BeautifulSoup
+from datetime import datetime
+import asyncio
+import re
+
+async def scrape_all_sources(sources: list) -> list:
+    """
+    Scrape all threat sources concurrently.
+    
+    For each source, fetch the RSS feed and extract articles.
+    Returns a list of raw article dicts.
+    """
+    tasks = []
+    for source in sources:
+        tasks.append(scrape_single_source(source))
+    
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    # Flatten results and filter out exceptions
+    articles = []
+    for result in results:
+        if isinstance(result, Exception):
+            continue
+        if result:
+            articles.extend(result)
+    
+    return articles
+
+async def scrape_single_source(source: dict) -> list:
+    """Scrape a single RSS feed source."""
+    try:
+        source_name = source.get("name", "Unknown")
+        source_url = source.get("url", "")
+        
+        # Fetch the feed
+        feed = feedparser.parse(source_url)
+        
+        if feed.bozo:
+            print(f"[SCRAPER WARNING] Feed parsing warning for {source_name}: {feed.bozo_exception}")
+        
+        articles = []
+        for entry in feed.entries[:10]:  # Limit to 10 latest entries per source
+            title = entry.get("title", "No Title")
+            link = entry.get("link", source_url)
+            
+            # Extract summary/content
+            summary = entry.get("summary", "")
+            if not summary and hasattr(entry, "content"):
+                summary = entry.content[0].value if entry.content else ""
+            
+            # Strip HTML tags
+            clean_text = strip_html(summary)
+            
+            # Truncate to 800 characters
+            clean_text = clean_text[:800]
+            
+            # Get published date
+            pub_date = entry.get("published", datetime.utcnow().isoformat())
+            
+            articles.append({
+                "source_name": source_name,
+                "source_url": source_url,
+                "title": title,
+                "text": clean_text,
+                "pub_date": pub_date,
+                "link": link
+            })
+        
+        return articles
+    
+    except Exception as e:
+        print(f"[SCRAPER ERROR] {source.get('name', 'Unknown')}: {str(e)}")
+        return []
+
+def strip_html(html_text: str) -> str:
+    """Strip HTML tags from text using BeautifulSoup."""
+    try:
+        soup = BeautifulSoup(html_text, "html.parser")
+        text = soup.get_text(separator=" ", strip=True)
+        # Clean up multiple spaces
+        text = re.sub(r'\s+', ' ', text)
+        return text
+    except Exception:
+        # Fallback: simple regex-based HTML stripping
+        text = re.sub(r'<[^>]+>', '', html_text)
+        text = re.sub(r'\s+', ' ', text)
+        return text.strip()
