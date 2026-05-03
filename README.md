@@ -186,3 +186,5 @@ This makes it useful for:
 - Developers who need practical mitigation code
 - Small teams without a dedicated security analyst
 - Students learning how real threats are detected and handled
+
+[![Watch the video](https://img.youtube.com/vi/uY3SHZL5ms4/maxresdefault.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
