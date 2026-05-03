@@ -82,7 +82,7 @@ Built with **React** and **Vite**. Handles:
 
 ### Local LLM
 
-Uses a local **OpenAI-compatible model server** through **Ollama**. Self-contained — no external API keys required.
+Uses a local **OpenAI-compatible model server** through **Ollama**. Self-contained.
 
 ---
 
@@ -121,9 +121,9 @@ Threat Sources → Researcher Agent → Database → Realtime API/WebSocket → 
 ## Project Highlights
 
 - Local-first design
-- No external API key required
+- No external API key required for local setup
 - Structured threat data instead of raw articles
-- Visual threat mapping
+- Visual threat mapping using 3D Graph
 - On-demand mitigation generation
 - Realtime dashboard updates
 - Simple database-backed persistence
